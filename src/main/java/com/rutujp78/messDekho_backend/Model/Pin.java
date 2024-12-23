@@ -1,5 +1,6 @@
 package com.rutujp78.messDekho_backend.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.Date;
 @Document(collection = "pins")
 public class Pin {
     @Id
+    @JsonProperty("_id")
     private String id;
 
     private String username;

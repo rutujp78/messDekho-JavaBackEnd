@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -48,13 +47,6 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public ResponseEntity<Object> getUser(String id) throws Exception {
-        Optional<User> optUser = userRepository.findById(id);
-        if(optUser.isEmpty()) return new ResponseEntity<>(getRespAsMessage(getUserNotFoundMsg(id)), HttpStatus.NOT_FOUND);
-        else return new ResponseEntity<>(optUser.get(), HttpStatus.OK);
-    }
-
-    @Override
     public ResponseEntity<Object> login(@RequestBody User user) throws Exception {
         Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
         if(authentication.isAuthenticated()) {
@@ -77,6 +69,10 @@ public class UserServiceImpl implements UserService{
             user.getEmail() == null
         ) {
             return new ResponseEntity<>(getRespAsMessage("Incomplete User details."), HttpStatus.BAD_REQUEST);
+        }
+
+        if(userRepository.findByUsername(user.getUsername()) != null || userRepository.findByEmail(user.getEmail()) != null) {
+            return new ResponseEntity<>(getRespAsMessage("Account already exists."), HttpStatus.BAD_REQUEST);
         }
 
         User newUser = new User();

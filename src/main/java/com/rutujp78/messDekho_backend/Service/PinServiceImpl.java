@@ -12,7 +12,7 @@ import java.util.*;
 
 @Service
 public class PinServiceImpl implements PinService{
-    private final String unauthorizedMsg = "You are not authorized to delete this pin.";
+    private final String unauthorizedMsg = "You are not authorized to create, update and delete this pin.";
     @Autowired
     PinRepository pinRepository;
 
@@ -54,7 +54,7 @@ public class PinServiceImpl implements PinService{
         newPin.setCreatedAt(date);
         newPin.setUpdatedAt(date);
 
-        return new ResponseEntity<>(pinRepository.save(newPin), HttpStatus.OK);
+        return new ResponseEntity<>(pinRepository.save(newPin), HttpStatus.CREATED);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class PinServiceImpl implements PinService{
                 oldPin.setDesc(pin.getDesc());
             }
             if(pin.getRating() != null ) {
-                if((double) pin.getRating() > 0 && (double)pin.getRating() <= 5)
+                if((int)pin.getRating() > 0 && (int)pin.getRating() <= 5)
                     oldPin.setRating((int)pin.getRating());
                 else return new ResponseEntity<>(getRespAsMessage("Rating must be between 0 and 5"), HttpStatus.BAD_REQUEST);
             }
