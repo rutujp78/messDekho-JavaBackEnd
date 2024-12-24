@@ -3,6 +3,9 @@ package com.rutujp78.messDekho_backend.Service;
 import com.rutujp78.messDekho_backend.Model.Pin;
 import com.rutujp78.messDekho_backend.Repository.PinRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,11 +34,13 @@ public class PinServiceImpl implements PinService{
     }
 
     @Override
+    @Cacheable(value = "messdekho-pins")
     public ResponseEntity<Object> getAllPins() throws Exception {
         return new ResponseEntity<>(pinRepository.findAll(), HttpStatus.OK);
     }
 
     @Override
+    @CachePut(value = "messdekho-pins", key = "#result.body.id", condition = "#result.body instanceof T(com.rutujp78.messDekho_backend.Model.Pin)")
     public ResponseEntity<Object> createPin(Pin pin) throws Exception {
         String authenticatedUsername = getAuthenticatedUsername();
 
@@ -58,6 +63,7 @@ public class PinServiceImpl implements PinService{
     }
 
     @Override
+    @CachePut(value = "messdekho-pins", key = "#result.body.id", condition = "#result.body instanceof T(com.rutujp78.messDekho_backend.Model.Pin)")
     public ResponseEntity<Object> updatePin(Pin pin) throws Exception {
         Optional<Pin> optPin = pinRepository.findById(pin.getId());
         if(optPin.isPresent()) {
@@ -93,6 +99,7 @@ public class PinServiceImpl implements PinService{
     }
 
     @Override
+    @CacheEvict(value = "messdekho-pins", key = "#result.body.id", condition = "#result.body instanceof T(com.rutujp78.messDekho_backend.Model.Pin)")
     public ResponseEntity<Object> deletePin(String id) throws Exception {
         Optional<Pin> pin = pinRepository.findById(id);
         if(pin.isEmpty()) {
